@@ -1,0 +1,66 @@
+#!/bin/bash
+
+UPOWER_DEVICE_ID="/org/freedesktop/UPower/devices/battery_BAT0"
+
+STATE=$(upower -i $UPOWER_DEVICE_ID | grep -E "state|to\ full|time\ to\ empty|percentage" | grep state | tr -s " " | cut -d' ' -f3)
+TOFULL=$(upower -i $UPOWER_DEVICE_ID | grep -E "state|to\ full|percentage" | grep "to full" | tr -s " " | cut -d' ' -f5-)
+TOEMPTY=$(upower -i $UPOWER_DEVICE_ID | grep -E "state|to\ full|time\ to\ empty|percentage" | grep "time to empty" | tr -s " " | cut -d' ' -f5-)
+PERCENTAGE=$(upower -i $UPOWER_DEVICE_ID | grep -E "state|to\ full|time\ to\ empty|percentage" | grep "percentage" | tr -s " " | cut -d' ' -f3 | sed -e 's/\%//g')
+
+ICON_DIR="$(dirname `realpath $0`)/battery_icons/"
+ICON_EXT=png
+
+case $STATE in
+    "charging") S="c" ;;
+    "discharging") S="" ;;    
+    "fully-charged") S="f";
+esac
+
+case $PERCENTAGE in
+     [0-9]|1[0-2])  ICON=0$S.$ICON_EXT ;;
+    1[3-9]|2[0-4])  ICON=1$S.$ICON_EXT ;;
+    2[5-9]|3[0-6])  ICON=2$S.$ICON_EXT ;;
+    3[7-9]|4[0-8])  ICON=3$S.$ICON_EXT ;;
+      4[9]|5[0-6])  ICON=4$S.$ICON_EXT ;;
+    5[7-9]|6[0-4])  ICON=5$S.$ICON_EXT ;;                
+    6[5-9]|7[0-2])  ICON=6$S.$ICON_EXT ;;
+        7[3-9]|81)  ICON=7$S.$ICON_EXT ;;
+    8[2-9]|9[0-9]|100)  ICON=8$S.$ICON_EXT ;;            
+    *)              ICON=x.$ICON_EXT ;;
+esac
+
+echo "---DEBUG---"
+echo "UPOWER_DEVICE_ID=$UPOWER_DEVICE_ID"
+echo "STATE=$STATE"
+echo "TOFULL=$TOFULL"
+echo "TOEMPTY=$TOEMPTY"
+echo "PERCENTAGE=$PERCENTAGE"
+echo "ICON_DIR=$ICON_DIR"
+echo "ICON_EXT=$ICON_EXT"
+echo "S=$S"
+echo "ICON=$ICON"
+echo "---ENDDEBUG---"
+
+case $STATE in
+    "charging")
+    echo "<img>$ICON_DIR$ICON</img><txt>$PERCENTAGE%</txt><tool>--== Power Manager ==--
+State:          $STATE
+To Full:         $TOFULL
+Percentage: $PERCENTAGE%</tool><click>xfce4-power-manager-settings</click>"
+;;
+
+    "discharging")
+    echo "<img>$ICON_DIR$ICON</img><txt>$PERCENTAGE%</txt><tool>--== Power Manager ==--
+State:          $STATE
+To Empty:    $TOEMPTY
+Percentage: $PERCENTAGE%</tool><click>xfce4-power-manager-settings</click>"
+;;    
+
+    "fully-charged")
+    echo "<img>$ICON_DIR$ICON</img><txt>$PERCENTAGE%</txt><tool>--== Power Manager ==--
+State:          $STATE
+Percentage: $PERCENTAGE%</tool><click>xfce4-power-manager-settings</click>"
+;;
+esac
+
+exit 0 
