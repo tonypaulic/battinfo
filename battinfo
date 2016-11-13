@@ -29,18 +29,6 @@ case $PERCENTAGE in
     *)              ICON=x.$ICON_EXT ;;
 esac
 
-echo "---DEBUG---"
-echo "UPOWER_DEVICE_ID=$UPOWER_DEVICE_ID"
-echo "STATE=$STATE"
-echo "TOFULL=$TOFULL"
-echo "TOEMPTY=$TOEMPTY"
-echo "PERCENTAGE=$PERCENTAGE"
-echo "ICON_DIR=$ICON_DIR"
-echo "ICON_EXT=$ICON_EXT"
-echo "S=$S"
-echo "ICON=$ICON"
-echo "---ENDDEBUG---"
-
 case $STATE in
     "charging")
     echo "<img>$ICON_DIR$ICON</img><txt>$PERCENTAGE%</txt><tool>--== Power Manager ==--
